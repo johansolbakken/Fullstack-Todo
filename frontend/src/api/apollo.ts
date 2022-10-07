@@ -15,12 +15,14 @@ query GetTodos {
 }
 `;
 
-export const TOGGLE_TODO = gql`
-        mutation ToggleTodo(
-          $id: Int!
+export const SET_TODO_CHECKED = gql`
+        mutation SetTodoChecked(
+          $id: String!
+          $checked: Boolean!
         ) {
-        toggleTodo(id: $id) {
+          setTodoChecked(id: $id, checked: $checked) {
           id
+          checked
         }
       }
 `;
@@ -39,7 +41,7 @@ export const ADD_TODO = gql`
 
 export const DELETE_TODO = gql`
 mutation DeleteTodo (
-  $id: Int!
+  $id: String!
 ) {
   deleteTodo(id: $id) {
     id
@@ -51,13 +53,12 @@ mutation DeleteTodo (
 
 export const SET_TODO_TEXT = gql`
 mutation SetTodoText (
-  $id: Int!
+  $id: String!
   $text: String!
 ) {
   setTodoText(id: $id, text: $text) {
     id
     text
-    checked
   }
 }
 `;

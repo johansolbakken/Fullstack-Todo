@@ -1,6 +1,5 @@
-import { GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { todos } from "../data";
-import { deleteTodo, Todo } from "../data/Todos";
+import { GraphQLBoolean, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
+import Todo from "../models/Todo";
 import { TodoType } from "./Todo";
 
 export const RootQueryType = new GraphQLObjectType({
@@ -10,15 +9,15 @@ export const RootQueryType = new GraphQLObjectType({
         todos: {
             type: GraphQLList(TodoType),
             description: 'List of todos',
-            resolve: () => todos
+            resolve: () => Todo.find().then(todos => todos)
         },
         todo: {
             type: TodoType,
             description: 'A single todo',
             args: {
-                id: { type: GraphQLInt }
+                id: { type: GraphQLString }
             },
-            resolve: (_parent, args) => todos.find(todo => todo.id === args.id)
+            resolve: (_parent, args) => Todo.findById(args.id)
         }
     })
 });
@@ -33,29 +32,17 @@ export const RootMutationType = new GraphQLObjectType({
             args: {
                 text: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: (_parent, args) => {
-                const todo: Todo = {
-                    id: todos.length + 1,
-                    text: args.text,
-                    checked: false
-                }
-                todos.push(todo);
-                return todo;
-            }
+            resolve: (_parent, args) =>
+                Todo.insertMany([{ text: args.text, checked: false }]).then(todos => todos[0])
         },
-        toggleTodo: {
+        setTodoChecked: {
             type: TodoType,
             description: 'Toggle a todo',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) }
+                id: { type: GraphQLNonNull(GraphQLString) },
+                checked: { type: GraphQLNonNull(GraphQLBoolean) }
             },
-            resolve: (_parent, args) => {
-                const todo = todos.find(todo => todo.id === args.id);
-                if (todo !== undefined) {
-                    todo.checked = !todo.checked;
-                }
-                return todo;
-            }
+            resolve: (_parent, args) => Todo.findByIdAndUpdate({ _id: args.id }, { checked: args.checked })
         },
         deleteTodo: {
             type: TodoType,
@@ -63,20 +50,16 @@ export const RootMutationType = new GraphQLObjectType({
             args: {
                 id: { type: GraphQLNonNull(GraphQLInt) }
             },
-            resolve: (_parent, args) => deleteTodo(args.id)
+            resolve: (_parent, args) => Todo.findByIdAndDelete({ _id: args.id })
         },
         setTodoText: {
             type: TodoType,
             description: 'Set text on a todo',
             args: {
-                id: { type: GraphQLNonNull(GraphQLInt) },
+                id: { type: GraphQLNonNull(GraphQLString) },
                 text: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: (_parent, args) => {
-                const id = todos.findIndex(todo => todo.id === args.id);
-                todos[id].text = args.text;
-                return todos[id];
-            }
+            resolve: (_parent, args) => Todo.findByIdAndUpdate({ _id: args.id }, { text: args.text })
         }
     })
 });

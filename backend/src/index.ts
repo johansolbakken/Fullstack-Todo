@@ -1,10 +1,23 @@
+import { config } from "dotenv";
 import express from "express";
 import { graphqlHTTP, Options } from "express-graphql";
 import { GraphQLSchema } from "graphql";
+import mongoose from "mongoose";
 import { RootMutationType, RootQueryType } from "./services";
 var cors = require('cors');
 
+config();
+
 const app = express();
+
+mongoose.connect(String(process.env.MONGO_URI)).then(() => {
+    console.log('DB Connected');
+})
+.catch(err => {
+    console.log("DB connection error", err);
+});
+
+
 app.use(cors());
 
 const schema = new GraphQLSchema({

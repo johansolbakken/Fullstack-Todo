@@ -4,7 +4,7 @@ export const TodoType: GraphQLObjectType = new GraphQLObjectType({
     name: 'Todo',
     description: 'Represents a todo',
     fields: () => ({
-        id: { type: GraphQLNonNull(GraphQLInt) },
+        id: { type: GraphQLNonNull(GraphQLString) },
         text: { type: GraphQLNonNull(GraphQLString) },
         checked: { type: GraphQLBoolean }
     })
