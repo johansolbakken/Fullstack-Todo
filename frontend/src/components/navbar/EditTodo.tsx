@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { SET_TODO_TEXT } from "../../api/apollo";
 
 interface EditTodoProps {
-  id: number;
+  id: string;
   text: string;
   open: boolean;
   onClose: () => void;

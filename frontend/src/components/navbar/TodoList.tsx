@@ -11,19 +11,19 @@ import {
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { useMutation, useQuery } from "@apollo/client";
-import { DELETE_TODO, GET_ALL_TODOS, TOGGLE_TODO } from "../../api/apollo";
+import { DELETE_TODO, GET_ALL_TODOS, SET_TODO_CHECKED } from "../../api/apollo";
 import { Todo } from "../../data/Todo";
 import { EditTodo } from "./EditTodo";
 import { useState } from "react";
 
 export const TodoList = () => {
-  const [editId, setEditId] = useState<number>(0);
+  const [editId, setEditId] = useState<string>("");
   const [editText, setEditText] = useState<string>("");
   const [showEdit, setShowEdit] = useState<boolean>(false);
 
   const { loading, error, data } = useQuery(GET_ALL_TODOS);
 
-  const [toggleTodo] = useMutation(TOGGLE_TODO, {
+  const [setTodoChecked] = useMutation(SET_TODO_CHECKED, {
     refetchQueries: ["GetTodos"],
   });
 
@@ -62,7 +62,7 @@ export const TodoList = () => {
                 <TableCell component="th" scope="row">
                   <Checkbox
                     checked={data.checked}
-                    onChange={() => toggleTodo({ variables: { id: data.id } })}
+                    onChange={() => setTodoChecked({ variables: { id: data.id, checked: !data.checked } })}
                   />
                 </TableCell>
                 <TableCell>{data.text}</TableCell>
